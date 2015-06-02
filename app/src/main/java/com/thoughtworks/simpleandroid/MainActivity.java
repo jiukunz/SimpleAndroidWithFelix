@@ -1,6 +1,6 @@
 package com.thoughtworks.simpleandroid;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,19 +25,41 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 
-public class MainActivity extends ActionBarActivity {
-
+public class MainActivity extends Activity {
     private Framework framework;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         launchFramework();
         initExtensionPoint();
-        startBundle("extension-a.jar");
-        //        startBundle("extension-b.jar");
+        startBundle("extension-a-1.0.0.jar");
+//        startBundle("extension-b.jar");
+    }
+
+    private void startBundle(String bundle) {
+        Log.d("osgi", "installing bundle " + bundle);
+        InputStream stream = null;
+        try {
+            stream = getAssets().open("bundles/" + bundle);
+            org.osgi.framework.Bundle installed = framework.getBundleContext().installBundle(bundle, stream);
+            Log.d("osgi", "bundle " + bundle + " installed");
+            installed.start();
+            Log.d("osgi", "bundle " + bundle + " started");
+        } catch (IOException e) {
+            Log.e("osgi", "install bundle failed", e);
+        } catch (BundleException e) {
+            Log.e("osgi", "install bundle failed", e);
+        } finally {
+            try {
+                if (stream != null)  stream.close();
+            } catch (IOException e) {
+                Log.e("osgi", e.toString());
+            }
+        }
     }
 
     private void launchFramework() {
@@ -58,9 +80,15 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    private void initExtensionPoint() {
+        ServiceTracker<TextProvider, TextProvider> extensions
+                = new ServiceTracker<>(framework.getBundleContext(), TextProvider.class, new ExtensionPoint(this));
+        extensions.open(true);
+    }
+
     private Map<String, String> getFrameworkConfig() {
-        HashMap<String, String> config = new HashMap<String, String>();
-        config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, "android,com.thoughtworks.extensionpoint");
+        HashMap<String, String> config = new HashMap<>();
+        config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, "com.thoughtworks.extensionpoint");
         try {
             config.put(Constants.FRAMEWORK_STORAGE, File.createTempFile("osgi", "launcher").getParent());
         } catch (IOException e) {
@@ -68,53 +96,6 @@ public class MainActivity extends ActionBarActivity {
         }
         return config;
     }
-
-    private void initExtensionPoint() {
-        ServiceTracker<TextProvider, TextProvider> extensions
-                = new ServiceTracker<>(framework.getBundleContext(), TextProvider.class, new ExtensionPoint(this));
-        extensions.open(true);
-    }
-
-    private void startBundle(String bundle) {
-        Log.d("osgi", "installing bundle " + bundle);
-        InputStream stream = null;
-        try {
-            stream = getAssets().open("bundles/" + bundle);
-            org.osgi.framework.Bundle installed = framework.getBundleContext().installBundle(bundle, stream);
-            Log.d("osgi", "bundle " + bundle + " installed");
-            installed.start();
-            Log.d("osgi", "bundle " + bundle + " started");
-        } catch (IOException e) {
-            Log.e("osgi", "install bundle failed", e);
-        } catch (BundleException e) {
-            Log.e("osgi", "install bundle failed", e);
-        } finally {
-            try {
-                if (stream != null) stream.close();
-            } catch (IOException e) {
-                Log.e("osgi", e.toString());
-            }
-        }
-    }
-
-    public void addButton(int id, String text) {
-        Button button = new Button(this);
-        button.setId(id);
-        button.setText(text);
-
-        Log.d("extension point", "add button " + text);
-
-        LinearLayout layout = (LinearLayout) findViewById(R.id.main);
-        layout.addView(button, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-    }
-
-
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -136,5 +117,18 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addButton(int id, String text) {
+        Button button = new Button(this);
+        button.setId(id);
+        button.setText(text);
+
+        Log.d("extension point", "add button " + text);
+
+        LinearLayout layout = (LinearLayout)findViewById(R.id.main);
+        layout.addView(button, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 }
