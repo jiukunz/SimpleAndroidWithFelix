@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
         launchFramework();
         initExtensionPoint();
         startBundle("extension-a-2.0.0.jar");
-//        startBundle("extension-b.jar");
+        startBundle("extension-b-2.0.0.jar");
     }
 
     private void startBundle(String bundle) {
