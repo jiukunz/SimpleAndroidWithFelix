@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
 
         launchFramework();
         initExtensionPoint();
-        startBundle("extension-a-1.0.0.jar");
+        startBundle("extension-a-2.0.0.jar");
 //        startBundle("extension-b.jar");
     }
 
@@ -82,13 +82,14 @@ public class MainActivity extends Activity {
 
     private void initExtensionPoint() {
         ServiceTracker<TextProvider, TextProvider> extensions
-                = new ServiceTracker<>(framework.getBundleContext(), TextProvider.class, new ExtensionPoint(this));
+                = new ServiceTracker<TextProvider, TextProvider>(framework.getBundleContext(), TextProvider.class, new ExtensionPoint(this));
         extensions.open(true);
     }
 
     private Map<String, String> getFrameworkConfig() {
-        HashMap<String, String> config = new HashMap<>();
+        HashMap<String, String> config = new HashMap<String, String>();
         config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, "com.thoughtworks.extensionpoint");
+        config.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
         try {
             config.put(Constants.FRAMEWORK_STORAGE, File.createTempFile("osgi", "launcher").getParent());
         } catch (IOException e) {
