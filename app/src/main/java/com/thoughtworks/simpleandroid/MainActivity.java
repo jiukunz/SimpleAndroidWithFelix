@@ -82,12 +82,12 @@ public class MainActivity extends Activity {
 
     private void initExtensionPoint() {
         ServiceTracker<TextProvider, TextProvider> extensions
-                = new ServiceTracker<TextProvider, TextProvider>(framework.getBundleContext(), TextProvider.class, new ExtensionPoint(this));
+                = new ServiceTracker<>(framework.getBundleContext(), TextProvider.class, new ExtensionPoint(this));
         extensions.open(true);
     }
 
     private Map<String, String> getFrameworkConfig() {
-        HashMap<String, String> config = new HashMap<String, String>();
+        HashMap<String, String> config = new HashMap<>();
         config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, "com.thoughtworks.extensionpoint");
         config.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
         try {
