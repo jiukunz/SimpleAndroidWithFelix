@@ -1,6 +1,7 @@
 package com.thoughtworks.simpleandroid;
 
 import android.util.Log;
+import android.widget.LinearLayout;
 
 import com.thoughtworks.extensionpoint.TextProvider;
 
@@ -23,7 +24,11 @@ public class ExtensionPoint implements ServiceTrackerCustomizer<TextProvider, Te
 
         Log.d("extension point", "extension from " + context.getBundle().getSymbolicName());
         TextProvider service = context.getService(serviceReference);
-        activity.addButton(serviceReference.hashCode(), service.text());
+
+        activity.addContentView(service.text(activity.getApplicationContext()),new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+
         Log.d("extension point", "extension id " + serviceReference.hashCode());
 
         return service;

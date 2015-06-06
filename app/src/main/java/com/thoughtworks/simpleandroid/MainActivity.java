@@ -5,9 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.LinearLayout;
-
 import com.thoughtworks.extensionpoint.TextProvider;
 
 import org.osgi.framework.BundleException;
@@ -28,6 +25,39 @@ import java.util.ServiceLoader;
 public class MainActivity extends Activity {
     private Framework framework;
 
+    static final String ANDROID_FRAMEWORK_PACKAGES = (
+            "android,"
+                    + "android.app,"
+                    + "android.content,"
+                    + "android.database,"
+                    + "android.database.sqlite,"
+                    + "android.graphics,"
+                    + "android.graphics.drawable,"
+                    + "android.graphics.glutils,"
+                    + "android.hardware,"
+                    + "android.location,"
+                    + "android.media,"
+                    + "android.net,"
+                    + "android.net.wifi,"
+                    + "android.opengl,"
+                    + "android.os,"
+                    + "android.provider,"
+                    + "android.sax,"
+                    + "android.speech.recognition,"
+                    + "android.telephony,"
+                    + "android.telephony.gsm,"
+                    + "android.text,"
+                    + "android.text.method,"
+                    + "android.text.style,"
+                    + "android.text.util,"
+                    + "android.util,"
+                    + "android.view,"
+                    + "android.view.animation,"
+                    + "android.webkit,"
+                    + "osgi.wiring.package,"
+                    + "com.thoughtworks.extensionpoint,"
+                    + "android.widget");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +66,8 @@ public class MainActivity extends Activity {
 
         launchFramework();
         initExtensionPoint();
-        startBundle("extension-a-2.0.0.jar");
-        startBundle("extension-b-2.0.0.jar");
+        startBundle("extension-a-1.0.0.jar");
+        startBundle("extension-b-1.0.0.jar");
     }
 
     private void startBundle(String bundle) {
@@ -88,7 +118,7 @@ public class MainActivity extends Activity {
 
     private Map<String, String> getFrameworkConfig() {
         HashMap<String, String> config = new HashMap<>();
-        config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, "com.thoughtworks.extensionpoint");
+        config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, ANDROID_FRAMEWORK_PACKAGES);
         config.put(Constants.FRAMEWORK_STORAGE_CLEAN, Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
         try {
             config.put(Constants.FRAMEWORK_STORAGE, File.createTempFile("osgi", "launcher").getParent());
@@ -120,16 +150,5 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void addButton(int id, String text) {
-        Button button = new Button(this);
-        button.setId(id);
-        button.setText(text);
 
-        Log.d("extension point", "add button " + text);
-
-        LinearLayout layout = (LinearLayout)findViewById(R.id.main);
-        layout.addView(button, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-    }
 }
